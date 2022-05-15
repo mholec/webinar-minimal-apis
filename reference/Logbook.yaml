@@ -212,7 +212,7 @@ components:
           maxLength: 7
           pattern: '^[a-z0-9]{7}$'
           description: APID jízdy
-          example: 0psH9HJ
+          example: 0psh9jh
         destination:
           type: string
           maxLength: 100
