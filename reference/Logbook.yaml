@@ -19,6 +19,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RideCollection'
+              examples:
+                success:
+                  value:
+                    items:
+                      - apid: 0psH9HJ
+                        destination: Pardubice
+                        date: '2022-01-09'
+                        distance: 82.8
+                        carId: s906u8s
         '500':
           $ref: '#/components/responses/InternalServerError'
       operationId: GetRides
@@ -43,6 +52,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Ride'
+              examples:
+                success:
+                  value:
+                    apid: 0psH9HJ
+                    destination: Pardubice
+                    date: '2022-01-09'
+                    distance: 82.8
+                    carId: s906u8s
         '400':
           $ref: '#/components/responses/BadRequest'
         '500':
@@ -52,6 +69,13 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/RideCreate'
+            examples:
+              valid-request:
+                value:
+                  destination: Praha
+                  date: '2022-05-19'
+                  distance: 18.9
+                  carId: p9os76h
         description: ''
       tags:
         - Rides
@@ -85,6 +109,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Ride'
+              examples:
+                success:
+                  value:
+                    apid: 0psH9HJ
+                    destination: Pardubice
+                    date: '2022-01-09'
+                    distance: 82.8
+                    carId: s906u8s
         '404':
           $ref: '#/components/responses/NotFound'
         '500':
@@ -102,6 +134,11 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AuthToken'
+              examples:
+                success:
+                  value:
+                    token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
+                    expires: '2019-08-24T14:15:22Z'
         '400':
           $ref: '#/components/responses/BadRequest'
         '500':
@@ -112,6 +149,11 @@ paths:
           application/x-www-form-urlencoded:
             schema:
               $ref: '#/components/schemas/Credentials'
+            examples:
+              valid-request:
+                value:
+                  username: johndoe
+                  password: sk8ksjdld**s!d
       description: Vystaví token na základě úspěšného ověření uživatele
 components:
   schemas:
@@ -123,6 +165,7 @@ components:
         items:
           type: array
           description: Seznam jízd odpovídajících požadavku
+          maxItems: 100
           items:
             $ref: '#/components/schemas/Ride'
     RideCreate:
@@ -134,21 +177,25 @@ components:
           type: string
           maxLength: 100
           description: Cíl jízdy
+          example: Praha
         date:
           type: string
           format: date
           description: Datum jízdy
+          example: '2022-05-19'
         distance:
           type: number
           format: double
           minimum: 0
           description: Vzdálenost v kilometrech
+          example: 18.9
         carId:
           type: string
           minLength: 7
           maxLength: 7
           pattern: '^[a-z0-9]{7}$'
           description: APID vozidla
+          example: p9os76h
       required:
         - destination
         - date
@@ -165,25 +212,30 @@ components:
           maxLength: 7
           pattern: '^[a-z0-9]{7}$'
           description: APID jízdy
+          example: 0psH9HJ
         destination:
           type: string
           maxLength: 100
           description: Cíl jízdy
+          example: Pardubice
         date:
           type: string
           format: date
           description: Datum uskutečnění jízdy
+          example: '2022-01-09'
         distance:
           type: number
           format: double
           minimum: 0
           description: Vzdálenost v kilometrech
+          example: 82.8
         carId:
           type: string
           pattern: '^[a-z0-9]{7}$'
           minLength: 7
           maxLength: 7
           description: APID vozidla
+          example: s906u8s
     AuthToken:
       title: AuthToken
       type: object
@@ -192,6 +244,7 @@ components:
         token:
           type: string
           description: JWT token
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
         expires:
           type: string
           format: date-time
@@ -204,9 +257,11 @@ components:
         username:
           type: string
           description: Uživatelské jméno
+          example: johndoe
         password:
           type: string
           description: Heslo
+          example: sk8ksjdld**s!d
     ProblemDetails:
       title: ProblemDetails
       type: object
@@ -216,17 +271,21 @@ components:
           type: string
           format: uri
           description: Druh chyby a odkaz na detaily (URL)
+          example: 'https://www.restapi.cz/probs/problem-details'
         status:
           type: integer
           minimum: 400
           maximum: 599
           description: 'Stavový kód, koresponduje s HTTP Status Code'
+          example: 500
         title:
           type: string
           description: Statický název chyby
+          example: Internal Server Error
         detail:
           type: string
           description: Detailní informace k chybě
+          example: '---'
     ValidationProblemDetails:
       title: ProblemDetails
       type: object
@@ -236,14 +295,18 @@ components:
           type: string
           description: Druh chyby a odkaz na detaily (URL)
           format: uri
+          example: 'https://www.restapi.cz/probs/validation-problem-details'
         status:
           type: integer
           minimum: 400
           maximum: 599
+          example: 400
         title:
           type: string
+          example: Validation Failed
         detail:
           type: string
+          example: More information in errors property
         errors:
           type: array
           items:
@@ -256,9 +319,11 @@ components:
         propertyName:
           type: string
           description: Název validované vlastnosti
+          example: Destination
         errorMessage:
           type: string
           description: Popis validační chyby
+          example: Destination field is required!
   responses:
     BadRequest:
       description: Chyba vzniklá na základě neúspěšné validace nebo nevalidního požadavku
@@ -266,15 +331,39 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/ValidationProblemDetails'
+          examples:
+            bad-request:
+              value:
+                type: 'https://www.restapi.cz/probs/validation-problem-details'
+                status: 400
+                title: Validation Failed
+                detail: More information in errors property
+                errors:
+                  - propertyName: Destination
+                    errorMessage: Destination field is required!
     NotFound:
       description: Požadovaný resource nebyl nalezen. Může se jednat o neexistující URL nebo konkrétní instanci objektu na základě neexistujícího identifikátoru.
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/ProblemDetails'
+          examples:
+            not-found:
+              value:
+                type: 'https://www.restapi.cz/probs/problem-details'
+                status: 404
+                title: Resource Not Found
+                detail: Resource with request APID does not exists!
     InternalServerError:
       description: 'Obecná chyba serveru. Server požadavek přijal, ale nebyl schopen jej zpracovat z důvodu vzniku neočekávané chyby.'
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/ProblemDetails'
+          examples:
+            internal-server-error:
+              value:
+                type: 'https://www.restapi.cz/probs/problem-details'
+                status: 500
+                title: Internal Server Error
+                detail: '---'
