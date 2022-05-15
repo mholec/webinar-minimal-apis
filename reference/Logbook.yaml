@@ -6,6 +6,7 @@ servers:
   - url: 'http://localhost:3000'
 tags:
   - name: Rides
+  - name: Auth
 paths:
   /rides:
     get:
@@ -155,6 +156,8 @@ paths:
                   username: johndoe
                   password: sk8ksjdld**s!d
       description: Vystaví token na základě úspěšného ověření uživatele
+      tags:
+        - Auth
 components:
   schemas:
     RideCollection:
