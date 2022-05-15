@@ -19,6 +19,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RideCollection'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
       operationId: GetRides
       parameters:
         - schema:
@@ -259,19 +261,19 @@ components:
           description: Popis validační chyby
   responses:
     BadRequest:
-      description: Example response
+      description: Chyba vzniklá na základě neúspěšné validace nebo nevalidního požadavku
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/ValidationProblemDetails'
     NotFound:
-      description: Example response
+      description: Požadovaný resource nebyl nalezen. Může se jednat o neexistující URL nebo konkrétní instanci objektu na základě neexistujícího identifikátoru.
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/ProblemDetails'
     InternalServerError:
-      description: Example response
+      description: 'Obecná chyba serveru. Server požadavek přijal, ale nebyl schopen jej zpracovat z důvodu vzniku neočekávané chyby.'
       content:
         application/json:
           schema:
