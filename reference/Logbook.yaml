@@ -145,6 +145,8 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
       description: Vrací pouze výsledek operace bez payload response
+      tags:
+        - Rides
   /auth/token:
     post:
       summary: CreateAuthToken
