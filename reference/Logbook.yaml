@@ -26,8 +26,11 @@ paths:
             pattern: '^[a-z0-9]{7}$'
             minLength: 7
             maxLength: 7
+            example: lo9ui67
           in: query
           name: carId
+          description: APID vozidla
+      description: Vrací seznam jízd s ohledem na filtr
     post:
       summary: CreateRide
       operationId: CreateRide
@@ -38,6 +41,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Ride'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
       requestBody:
         content:
           application/json:
@@ -49,8 +56,11 @@ paths:
       parameters:
         - schema:
             type: string
+            example: 888a360a-114d-4bac-8726-d87d58900f20
           in: header
           name: idempotency-key
+          description: Klíč pro zajištění idempotentnosti
+      description: Vytvoření nové jízdy v knize jízd.
   '/rides/{id}':
     parameters:
       - schema:
@@ -61,6 +71,7 @@ paths:
         name: id
         in: path
         required: true
+        description: APID jízdy
     get:
       summary: GetRideById
       tags:
@@ -72,7 +83,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Ride'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
       operationId: GetRideById
+      description: Vrácení detailů jízdy dle APID
   /auth/token:
     post:
       summary: ''
@@ -84,39 +100,53 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AuthToken'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
       parameters: []
       requestBody:
         content:
           application/x-www-form-urlencoded:
             schema:
               $ref: '#/components/schemas/Credentials'
+      description: Vystaví token na základě úspěšného ověření uživatele
 components:
   schemas:
     RideCollection:
       title: RideCollection
       type: object
+      description: Model reprezentuje seznam jízdy
       properties:
-        id:
-          type: string
+        items:
+          type: array
+          description: Seznam jízd odpovídajících požadavku
+          items:
+            $ref: '#/components/schemas/Ride'
     RideCreate:
       type: object
       title: RideCreate
+      description: Model pro vytváření nové jízdy v knize jízd
       properties:
         destination:
           type: string
           maxLength: 100
+          description: Cíl jízdy
         date:
           type: string
           format: date
+          description: Datum jízdy
         distance:
           type: number
           format: double
           minimum: 0
+          description: Vzdálenost v kilometrech
         carId:
           type: string
           minLength: 7
           maxLength: 7
           pattern: '^[a-z0-9]{7}$'
+          description: APID vozidla
       required:
         - destination
         - date
@@ -124,42 +154,125 @@ components:
         - carId
     Ride:
       type: object
-      title: RideCreate
+      title: Ride
+      description: Jedna jízda z knihy jízd
       properties:
         apid:
           type: string
           minLength: 7
           maxLength: 7
           pattern: '^[a-z0-9]{7}$'
+          description: APID jízdy
         destination:
           type: string
           maxLength: 100
+          description: Cíl jízdy
         date:
           type: string
           format: date
+          description: Datum uskutečnění jízdy
         distance:
           type: number
           format: double
           minimum: 0
+          description: Vzdálenost v kilometrech
         carId:
           type: string
           pattern: '^[a-z0-9]{7}$'
           minLength: 7
           maxLength: 7
+          description: APID vozidla
     AuthToken:
       title: AuthToken
       type: object
+      description: Autentizační token s identitou uživatele (ID token / JWT)
       properties:
         token:
           type: string
+          description: JWT token
         expires:
           type: string
           format: date-time
+          description: Expirace tokenu (platnost)
     Credentials:
       title: Credentials
       type: object
+      description: Model pro ověření uživatele na základě jména a hesla
       properties:
         username:
           type: string
+          description: Uživatelské jméno
         password:
           type: string
+          description: Heslo
+    ProblemDetails:
+      title: ProblemDetails
+      type: object
+      description: Generická chybová struktura pro většinu HTTP status kódů
+      properties:
+        type:
+          type: string
+          format: uri
+          description: Druh chyby a odkaz na detaily (URL)
+        status:
+          type: integer
+          minimum: 400
+          maximum: 599
+          description: 'Stavový kód, koresponduje s HTTP Status Code'
+        title:
+          type: string
+          description: Statický název chyby
+        detail:
+          type: string
+          description: Detailní informace k chybě
+    ValidationProblemDetails:
+      title: ProblemDetails
+      type: object
+      description: 'Specifická chybová struktura obsahující kolekci validačních chyb, obvykle používaná se stavovým kódem 400'
+      properties:
+        type:
+          type: string
+          description: Druh chyby a odkaz na detaily (URL)
+          format: uri
+        status:
+          type: integer
+          minimum: 400
+          maximum: 599
+        title:
+          type: string
+        detail:
+          type: string
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ValidationFailure'
+    ValidationFailure:
+      title: ValidationFailure
+      type: object
+      description: Detail validační chyby obsahující název validované vlastnosti a chybovou zprávu
+      properties:
+        propertyName:
+          type: string
+          description: Název validované vlastnosti
+        errorMessage:
+          type: string
+          description: Popis validační chyby
+  responses:
+    BadRequest:
+      description: Example response
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ValidationProblemDetails'
+    NotFound:
+      description: Example response
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+    InternalServerError:
+      description: Example response
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
