@@ -1,0 +1,165 @@
+openapi: 3.1.0
+info:
+  title: Logbook
+  version: '1.0'
+servers:
+  - url: 'http://localhost:3000'
+tags:
+  - name: Rides
+paths:
+  /rides:
+    get:
+      summary: GetRides
+      tags:
+        - Rides
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RideCollection'
+      operationId: GetRides
+      parameters:
+        - schema:
+            type: string
+            pattern: '^[a-z0-9]{7}$'
+            minLength: 7
+            maxLength: 7
+          in: query
+          name: carId
+    post:
+      summary: CreateRide
+      operationId: CreateRide
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ride'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RideCreate'
+        description: ''
+      tags:
+        - Rides
+      parameters:
+        - schema:
+            type: string
+          in: header
+          name: idempotency-key
+  '/rides/{id}':
+    parameters:
+      - schema:
+          type: string
+          pattern: '^[a-z0-9]{7}$'
+          minLength: 7
+          maxLength: 7
+        name: id
+        in: path
+        required: true
+    get:
+      summary: GetRideById
+      tags:
+        - Rides
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ride'
+      operationId: GetRideById
+  /auth/token:
+    post:
+      summary: ''
+      operationId: CreateAuthToken
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthToken'
+      parameters: []
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Credentials'
+components:
+  schemas:
+    RideCollection:
+      title: RideCollection
+      type: object
+      properties:
+        id:
+          type: string
+    RideCreate:
+      type: object
+      title: RideCreate
+      properties:
+        destination:
+          type: string
+          maxLength: 100
+        date:
+          type: string
+          format: date
+        distance:
+          type: number
+          format: double
+          minimum: 0
+        carId:
+          type: string
+          minLength: 7
+          maxLength: 7
+          pattern: '^[a-z0-9]{7}$'
+      required:
+        - destination
+        - date
+        - distance
+        - carId
+    Ride:
+      type: object
+      title: RideCreate
+      properties:
+        apid:
+          type: string
+          minLength: 7
+          maxLength: 7
+          pattern: '^[a-z0-9]{7}$'
+        destination:
+          type: string
+          maxLength: 100
+        date:
+          type: string
+          format: date
+        distance:
+          type: number
+          format: double
+          minimum: 0
+        carId:
+          type: string
+          pattern: '^[a-z0-9]{7}$'
+          minLength: 7
+          maxLength: 7
+    AuthToken:
+      title: AuthToken
+      type: object
+      properties:
+        token:
+          type: string
+        expires:
+          type: string
+          format: date-time
+    Credentials:
+      title: Credentials
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
