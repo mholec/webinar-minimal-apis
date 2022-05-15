@@ -2,8 +2,18 @@ openapi: 3.1.0
 info:
   title: Logbook
   version: '1.0'
+  summary: Jednoduchá specifikace API pro účely webináře Minimal APIs v .NET 6
+  description: 'API se zaměřuje na GET a POST metody, jako typické představitele safe a no-safe metod.'
+  contact:
+    name: Miroslav Holec
+    url: 'https://www.miroslavholec.cz'
+    email: mirek@miroslavholec.cz
+  license:
+    name: Webinar
+    url: 'https://www.miroslavholec.cz/webinare/minimal-apis-net-6/202205'
 servers:
-  - url: 'http://localhost:3000'
+  - url: 'https://localhost:5001'
+    description: Localhost
 tags:
   - name: Rides
   - name: Auth
@@ -124,9 +134,20 @@ paths:
           $ref: '#/components/responses/InternalServerError'
       operationId: GetRideById
       description: Vrácení detailů jízdy dle APID
+    head:
+      summary: HeadRideById
+      operationId: HeadRideById
+      responses:
+        '200':
+          description: OK
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+      description: Vrací pouze výsledek operace bez payload response
   /auth/token:
     post:
-      summary: ''
+      summary: CreateAuthToken
       operationId: CreateAuthToken
       responses:
         '200':
